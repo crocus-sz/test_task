@@ -17,7 +17,10 @@ class Planner {
         static int createTable(const char* path);
         static int createDB(const char* path);
         static int insertData(const char* path, std::string name, std::string note, std::string date);
+        static int deleteData(const char* path, std::string name);
         static int selectData(const char* path);
+        static int callback(void* NotUsed, int argc, char** argv, char** azColName);
+
         void showAllEvents();
         void addOneEvent();
         void deleteOneEvent();
