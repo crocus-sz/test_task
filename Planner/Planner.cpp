@@ -1,7 +1,7 @@
 #include "Planner.h"
 #include <cstddef>
 #include <iostream>
-#include <mysql/mysql.h>
+#include <sqlite3.h>
 
 Planner::Planner() {
     createDB(pathToDB);
@@ -89,19 +89,16 @@ int Planner::insertData(const char *path, std::string name, std::string note, st
 		sqlite3_free(messageError);
 	}
 	else
-	std::cout << "Records inserted Successfully!" << std::endl;
+	std::cout << "Done!" << std::endl;
         
     return 0;
-}
-void Planner::deleteOneEvent() {
-
 }
 
 int Planner::selectData(const char* path) {
     sqlite3* DB;
 	char* messageError;
 
-    std::string sql = "SELECT * FROM events;";
+    std::string sql = "SELECT NAME, NOTE, DATE  FROM events;";
 
 	int exit = sqlite3_open(path, &DB);
 	/* An open database, SQL to be evaluated, Callback function, 1st argument to callback, Error msg written here*/
@@ -112,14 +109,13 @@ int Planner::selectData(const char* path) {
 		sqlite3_free(messageError);
 	}
 	else
-		std::cout << "Records selected Successfully!" << std::endl;
+		std::cout << "Done!" << std::endl;
 
 	return 0;
 }
 
 
 int Planner::deleteData(const char* path, std::string name) {
-
     sqlite3* DB;
 	char* messageError;
 
@@ -133,22 +129,26 @@ int Planner::deleteData(const char* path, std::string name) {
 		sqlite3_free(messageError);
 	}
 	else
-		std::cout << "Records deleted Successfully!" << std::endl;
+		std::cout << "Done!" << std::endl;
 
 	return 0;
 
 }
 int Planner::callback(void* NotUsed, int argc, char** argv, char** azColName)
 {
+    std::cout << "-----------------------------------------" << std::endl;
 	for (int i = 0; i < argc; i++) {
 		// column name and value
-        std::cout << azColName[i] << ": " << argv[i] << std::endl;
+        std::cout << azColName[i] << ": " << argv[i] << " | ";
+        
 	}
 
     std::cout << std::endl;
-
 	return 0;
 }
+
+
+
 void Planner::addOneEvent() {
     system("clear");
     std::string name;
@@ -156,8 +156,8 @@ void Planner::addOneEvent() {
     std::string date;
 
     std::cout << "Enter a name of your event: " ;
+    std::cin.ignore(32, '\n');
     std::getline(std::cin, name);
-    std::cin.ignore(32767, '\n');
     std::cout << "Enter a date when it will happens: " ;
     std::getline(std::cin, date);
     std::cout << "Add some note to the event: " ;
@@ -166,16 +166,29 @@ void Planner::addOneEvent() {
     insertData(pathToDB, name, note, date);
 
 }
+
 void Planner::showAllEvents() {
+    system("clear");
     selectData(pathToDB);
+    std::cout << "-----------------------------------------" << std::endl;
+}
+
+void Planner::deleteOneEvent() {
+    system("clear");
+    std::string name;
+    std::cout << "Enter a event's name which you want to delete: ";
+    std::cin.ignore(32, '\n');
+    std::getline(std::cin, name);
+
+    deleteData(pathToDB, name);
 }
 
 void Planner::WelcomeMenu() {
     system("clear");
-    std::cout << "==============================" << std::endl;
-    std::cout << "This is your personal planner!" << std::endl;
-    std::cout << "Enjoy using this!" << std::endl;
-    std::cout << "==============================" << std::endl;
+    std::cout << "====================================" << std::endl;
+    std::cout << "|| This is your personal planner! ||" << std::endl;
+    std::cout << "||       Enjoy using this!        ||" << std::endl;
+    std::cout << "====================================" << std::endl;
     std::cout << std::endl;
 }
 
